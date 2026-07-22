@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+groq
+qdrant-client==1.18.0
+httpx
+python-dotenv
+tavily-python
+pydantic
