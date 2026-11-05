@@ -11,6 +11,8 @@ from generator import generate_answer
 from models import AskRequest, AskResponse, ContextChunk, Source
 from retriever import retrieve_chunks
 from search import search_web
+from config import get_settings
+import uvicorn
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("jee_rag")
@@ -67,3 +69,8 @@ async def ask_question(payload: AskRequest) -> AskResponse:
     except Exception as exc:
         logger.exception("Unhandled error while processing /ask")
         raise HTTPException(status_code=500, detail="Internal server error") from exc
+
+
+if __name__ == "__main__":
+    settings = get_settings()
+    uvicorn.run("main:app", host=settings.host, port=settings.port, reload=True)

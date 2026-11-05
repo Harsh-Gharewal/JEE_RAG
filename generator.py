@@ -152,7 +152,7 @@ def generate_answer(question: str, context_chunks: List[Dict[str, str]]) -> str:
     ]
 
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model=settings.groq_model,
         messages=messages,
         temperature=0.2,
         max_tokens=800,

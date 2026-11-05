@@ -8,11 +8,11 @@ import httpx
 from config import get_settings
 
 
-async def _embed_single(client: httpx.AsyncClient, text: str) -> List[float]:
+async def _embed_single(client: httpx.AsyncClient, text: str, model: str) -> List[float]:
     response = await client.post(
         "/api/embeddings",
         json={
-            "model": "nomic-embed-text",
+            "model": model,
             "prompt": text,
         },
     )
@@ -35,7 +35,7 @@ async def _embed_batch(texts: List[str]) -> List[List[float]]:
 
         async def guarded_embed(text: str) -> List[float]:
             async with semaphore:
-                return await _embed_single(client, text)
+                return await _embed_single(client, text, settings.ollama_embed_model)
 
         tasks = [guarded_embed(text) for text in texts]
         return await asyncio.gather(*tasks)

@@ -103,14 +103,12 @@ async def retrieve_chunks(
     top_k: int = 5,
 ) -> Tuple[str, List[Dict[str, str]]]:
     settings = get_settings()
-    port = 443 
     client = QdrantClient(
         url=settings.qdrant_url,
         api_key=settings.qdrant_api_key,
-        port=port,
     )
 
-    collection_name = "jee-rag"
+    collection_name = settings.qdrant_collection
     collections = await asyncio.to_thread(client.get_collections)
     existing = {collection.name for collection in collections.collections}
     if collection_name not in existing:
@@ -119,12 +117,15 @@ async def retrieve_chunks(
             collection_name=collection_name,
             vectors_config=VectorParams(size=768, distance=Distance.COSINE),
         )
-    await asyncio.to_thread(
-        client.create_payload_index,
-        collection_name=collection_name,
-        field_name="request_id",
-        field_schema="keyword",
-    )
+        try:
+            await asyncio.to_thread(
+                client.create_payload_index,
+                collection_name=collection_name,
+                field_name="request_id",
+                field_schema="keyword",
+            )
+        except Exception:
+            pass
 
     chunk_records: List[Dict[str, str]] = []
     seen_chunks = set()
